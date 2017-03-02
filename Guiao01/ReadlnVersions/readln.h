@@ -10,16 +10,3 @@
 ssize_t read(int fildes, void *buf, size_t nbyte);
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 int     close(int fildes);
-
-struct buffer_t{
-    
-    char *buf[MAXLINE];
-    int in, out; 
-
-};
-
-size_t readln(struct buffer_t *, void **);
-int create_buffer(int , struct buffer_t *, size_t);
-int destroy_buffer(struct buffer_t *);
-
-

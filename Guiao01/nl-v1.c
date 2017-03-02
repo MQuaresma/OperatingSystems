@@ -1,18 +1,15 @@
 #include "guiao01.h"
+#define SIZE 10
 
 ssize_t readln(int, void*, size_t);
-size_t parse(char*);
+void itoa(int, char*);
 
 int main(int argc, char *argv[]){
 
     size_t block = 100, r;
-    int fildes=0, line = 1;
+    int fildes=0, line = 1, m;
     char *buf=(char*)malloc(sizeof(char)*block);
-
-    if(argc <= 1){
-        fprintf(stderr, "Not enought arguments provided\n");
-        exit(1);
-    }
+    char no[SIZE];
 
     if(--argc > 0){
         ++ argv;
@@ -25,9 +22,12 @@ int main(int argc, char *argv[]){
         else printf("\t\n-------File: %s------\n",*argv);
     }
 
+    no[0] = '\t';
     while((r = readln(fildes, buf, block))>0){
-        printf("\t%d %s", ++line, buf);
-        //write(1, buf, r);
+        //sprintf(no+1, "%d", line++); //could also use sprintf to parse the integer to a string
+        itoa(line++, no+1);
+        write(1, no, strlen(no));
+        write(1, buf, r);
     }    
 }
 
@@ -44,4 +44,30 @@ ssize_t readln(int fildes, void *buf, size_t block){
     *(st+i) = '\0';
 
     return i;
+}
+
+void reverse(char p[], int size){
+
+    char c;
+    int j=0;
+
+    while(j < --size){
+        c = p[size];  
+        p[size] = p[j];
+        p[j++] = c;
+    }
+
+}
+
+void itoa(int in, char p[]){
+    
+    int i=0;
+
+    do{
+        p[i++] = (in%10) + '0';
+    }while(in/=10);
+
+    p[i] = '\0';
+
+    reverse(p, i);
 }
