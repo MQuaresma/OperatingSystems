@@ -13,7 +13,9 @@ int main(int argc, char *argv[]){
 
     int filde;
     int size = 10*1024*1024; // numbers of chars to be written 10^7 since each char uses 1byte of space
-    char c = 'a';
+    char buf[MAXLINE];
+
+    for(int i = 0; i < MAXLINE; i ++) buf[i] = 'a';
 
     if(argc <= 1){
         fprintf(stderr, "Not enought arguments provided\n");
@@ -28,7 +30,9 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    for(int i = 0; i < size; i++) write(filde, &c, 1);
+    size /= MAXLINE;
+
+    for(int i = 0; i < size; i++) write(filde, buf, MAXLINE);
 
     close(filde);
     exit(0);
