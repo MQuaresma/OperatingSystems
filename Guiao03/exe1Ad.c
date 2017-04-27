@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wait.h>
+#include <sys/wait.h>
 
 void parseCmd(char *cmd, char *argv[]){
 
@@ -18,7 +18,7 @@ void parseCmd(char *cmd, char *argv[]){
 
 void mySystem(char *cmd){
 
-    int i, len, code, eCode=0;
+    int i, len, code=1, eCode=0;
 
     for(i = 0, len = 0; cmd[i]; len += (cmd[i] == ' '), i ++);
 
@@ -29,7 +29,7 @@ void mySystem(char *cmd){
     do{
         eCode ++;
         if(!fork()){
-            execvp(*argv, argv);
+            execlp(cmd, cmd+2, NULL);
             perror("execvp");
             _exit(0);
         }
@@ -45,15 +45,20 @@ void mySystem(char *cmd){
  */
 int main(int argc, char *argv[]){
 
-    int code, pid[argc-1];
+    int code, *pid = (int*)calloc(argc-1, sizeof(int));
 
+    ++argv;
 
-    for(int i = 1; i < argc; i ++)
-        if(!(pid[i] = fork())) mySystem(argv[i]);
+    for(int i = 0; i < argc-1; i ++){
+        pid[i] = fork();
+        if(!pid[i])mySystem(argv[i]);
+    }
 
-    for(int i = 1; i < argc; i ++){
+    for(int i = 0; i < argc-1; i ++){
         waitpid(pid[i], &code, 0);
         printf("%s %d\n", argv[i], WEXITSTATUS(code));
     }    
+
+    free(pid);
 
 }

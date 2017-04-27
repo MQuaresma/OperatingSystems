@@ -4,8 +4,9 @@
 #include <signal.h>
 #include <sys/types.h>
 
-static int *cur;
-static int *prev;
+//store child's pid and command in a dict style array
+//set signal handlers for SIGALRM and SIGCHLD
+
 
 int main(int argc, char *argv[]){
 
