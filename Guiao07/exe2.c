@@ -15,8 +15,8 @@ int main(int argc, char *argv[]){
     signal(SIGCHLD, action);
     
     while(1){
-        execlp(argv[i], argv[i], NULL);
-        pause(); 
+        pause();
+        if(!fork()) execlp(argv[i], argv[i], NULL);
     }
 
 }
