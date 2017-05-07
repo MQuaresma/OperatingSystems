@@ -3,44 +3,44 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/types.h>
+#define TIMER 1
 
 //store child's pid and command in a dict style array
 //set signal handlers for SIGALRM and SIGCHLD
 
+static int *cur;
 
-int main(int argc, char *argv[]){
+void alarmHandler(int sig){
 
-    int i = 1, x[argc-1]={0};
-    signal(SIGALRM, action);
-    signal(SIGCHLD, action);
-    
-    while(1){
-        pause();
-        if(!fork()) execlp(argv[i], argv[i], NULL);
-    }
+    kill(*cur, SIGSTOP); //pause child
+
+}
+
+void chldManager(int sig){
+
+    *cur = 0; //child has finished
 
 }
 
 
-void executeCommands(int sig){
+int main(int argc, char *argv[]){
 
-    static int i = 1;
-    static int x[agc];
-    static int firstRun = 1;
+    int *x;
+    signal(SIGALRM, alarmHandler);
+    signal(SIGCHLD, chldManager);
 
-    if(i >= agc) i = 1;
-
-    alarm(1);
-    switch(sig){
-        case SIGALRM:
-            kill(*prev, SIGSTOP);
-            if(!firstRun) kill(x[i], SIGCONT);
-            else 
-            break;
-        case SIGCHLD:
-            if(i == argc-1) i = 1;
-            else i ++;
-            break;
-    }
-
+    if(argc >= 1){
+        x = (int*)calloc(argc-1, sizeof(int));
+        while(1){
+            for(int i = 1; i < argc; i ++){
+                cur = x+i-1;
+                alarm(TIMER);
+                if(!(*cur) && !(x[i-1] = fork())) execlp(argv[i], argv[i], NULL);
+                else kill(*cur, SIGCONT);
+                pause();
+            }    
+        }
+        free(x);
+    }    
+    
 }

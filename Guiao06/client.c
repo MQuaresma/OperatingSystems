@@ -9,8 +9,10 @@ int main(int argc, char *argv[]){
     int fd = open("pipe", O_WRONLY); 
     
     if(fd > 0){
-        ++argv;
-        write(fd, *argv, strlen(*argv));
+        if(argc > 1){
+            ++argv;
+            write(fd, *argv, strlen(*argv));
+        }else write(fd, "", 0);
         close(fd);
     }
 

@@ -9,12 +9,11 @@ void actions(int sig);
 
 main(){
 
-    sig_t pd = (void (*)(int))actions;
+    signal(SIGINT, actions);
+    signal(SIGQUIT, actions);
+    signal(SIGALRM, actions);
     alarm(TT);           //definir alarme que corre indefinidamente
-    signal(SIGINT, pd);
-    signal(SIGQUIT, pd);
-    signal(SIGALRM, pd);
-    
+        
     while(1) pause();
 
 }
@@ -23,16 +22,25 @@ main(){
 void actions(int sig){
     
     static int times = 0;
-    static long elapsed = 0;
+    static unsigned long elapsed = 0;
 
-    if(sig == SIGINT){
-        times ++;
-        elapsed += TT-alarm(TT);
-        printf("Elapsed Time: %ld\n", elapsed); 
-    }else if(sig == SIGALRM){
-        alarm(TT);
-    }else{
-        printf("Times pressed Ctrl-C: %d\n", times);
-        exit(0);
+    switch(sig){
+        case SIGINT:
+            times ++;
+            signal(SIGALRM, SIG_IGN);      //ignore expiring timers
+            signal(SIGINT, SIG_IGN);      //ignore expiring timers
+            elapsed += (TT-alarm(TT));
+            printf("Elapsed Time: %lu\n", elapsed); 
+            signal(SIGALRM, actions);
+            signal(SIGINT, actions);
+            break;
+        case SIGALRM:
+            elapsed += TT;
+            alarm(TT);
+            break;
+        default:
+            printf("Times pressed Ctrl-C: %d\n", times);
+            exit(0);
     }
+    
 }
